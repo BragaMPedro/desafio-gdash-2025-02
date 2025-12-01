@@ -1,10 +1,17 @@
 services:
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:latest
     container_name: rabbitmq
+    restart: always
     ports:
-      - "5672:5672"  # AMQP protocol
-      - "15672:15672" # Management UI
+      - 5672:5672
+      - 15672:15672 #UI manager
+    configs:
+      - source: rabbitmq-plugins
+        target: /etc/rabbitmq/enabled_plugins
+    volumes:
+      - rabbitmq-lib:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
     env_file:
       - ./.env
     environment:
@@ -28,11 +35,11 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - MONGODB_URI=${MONGODB_URI}
     networks:
       - gdash-network
     volumes:
       - mongo-data:/data/db
+      - mongo-config:/data/configdb
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -83,11 +90,8 @@ services:
     env_file:
       - ./.env
     environment:
-      - AMQP_URL=${AMQP_URL}
       - MONGODB_URI=${MONGODB_URI}
       - PORT=${API_PORT}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     networks:
       - gdash-network
   
@@ -109,6 +113,16 @@ networks:
   gdash-network:
     driver: bridge
 
+configs:
+  rabbitmq-plugins:
+    content: "[rabbitmq_management]."
+
 volumes:
+  rabbitmq-lib:
+    driver: local
+  rabbitmq-log:
+    driver: local
   mongo-data:
+    driver: local
+  mongo-config:
     driver: local

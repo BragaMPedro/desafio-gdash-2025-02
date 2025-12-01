@@ -22,5 +22,7 @@ FROM alpine:latest
 # Copy the built binary from the builder stage
 COPY --from=builder /go/bin/app /app
 
+EXPOSE 8080
+
 # Set the command to run the executable
 CMD ["/app"]
