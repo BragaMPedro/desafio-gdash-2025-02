@@ -6,11 +6,11 @@ import openmeteo_requests
 import requests_cache
 from retry_requests import retry
 
-AMQP_URL = os.getenv("AMQP_URL", "amqp://guest:guest@localhost:5672/")
+AMQP_URL = os.getenv("AMQP_URL", "amqp://rabbitmq:5672/")
 LATITUDE = float(os.getenv("LATITUDE", "-22.5046"))
 LONGITUDE = float(os.getenv("LONGITUDE", "-43.1823"))
 QUEUE_NAME = "weather_queue"
-FETCH_INTERVAL_SECONDS = 60
+FETCH_INTERVAL_SECONDS = 3600
 
 # --- Open-Meteo API Setup ---
 cache_session = requests_cache.CachedSession('.cache', expire_after=3300)
@@ -84,6 +84,7 @@ def main():
 
         print(
             f"Waiting for {FETCH_INTERVAL_SECONDS} seconds before next fetch...")
+
         time.sleep(FETCH_INTERVAL_SECONDS)
 
 
