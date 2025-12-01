@@ -14,7 +14,7 @@ const (
 	queueName        = "weather_queue"
 	retryCount       = 5
 	retryInterval    = 5 * time.Second
-	backendEndpoint  = "/api/weather/logs"
+	backendEndpoint  = "/api/weather"
 )
 
 func failOnError(err error, msg string) {
@@ -26,7 +26,7 @@ func failOnError(err error, msg string) {
 func main() {
 	amqpURL := os.Getenv("AMQP_URL")
 	if amqpURL == "" {
-		amqpURL = "amqp://guest:guest@localhost:5672/"
+		amqpURL = "amqp://rabbitmq:5672/"
 		log.Println("AMQP_URL not set, using default")
 	}
 
