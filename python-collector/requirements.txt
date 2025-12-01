@@ -1,3 +1,4 @@
 openmeteo-requests
 requests_cache
+retry_requests
 pika
