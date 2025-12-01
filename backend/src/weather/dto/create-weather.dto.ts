@@ -1,8 +1,8 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class CreateWeatherDto {
   @IsNumber()
-  readonly temp: number;
+  readonly temperature: number;
 
   @IsNumber()
   readonly humidity: number;
@@ -19,7 +19,12 @@ export class CreateWeatherDto {
   @IsNumber()
   readonly weather_code: number;
 
-  @IsOptional()
   @IsNumber()
   readonly timestamp: number;
+
+  @IsNumber()
+  readonly longitude: number;
+
+  @IsNumber()
+  readonly latitude: number;
 }
