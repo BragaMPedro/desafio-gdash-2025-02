@@ -1,20 +1,28 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
-import { User } from './schemas/user.schema';
+import { CreateUserDto } from './dto/create-user.dto';
+import { User, UserDocument } from './schemas/user.schema';
 import { UsersService } from './users.service';
 
+const mockUser = {
+  _id: '60d5f1b3e6b3f1b3e6b3f1b3',
+  name: 'Test User',
+  email: 'test@example.com',
+  role: 'user',
+} as unknown as UserDocument;
+
 const mockUserModel = {
-  new: jest.fn().mockResolvedValue({}),
-  constructor: jest.fn().mockResolvedValue({}),
-  find: jest.fn(),
   create: jest.fn(),
-  exec: jest.fn(),
+  find: jest.fn(),
+  findById: jest.fn(),
+  findByIdAndUpdate: jest.fn(),
+  findByIdAndDelete: jest.fn(),
 };
 
 describe('UsersService', () => {
   let service: UsersService;
-  let model: Model<User>;
+  let model: Model<UserDocument>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,7 +36,11 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    model = module.get<Model<User>>(getModelToken(User.name));
+    model = module.get<Model<UserDocument>>(getModelToken(User.name));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -36,99 +48,125 @@ describe('UsersService', () => {
   });
 
   describe('create', () => {
-    it('should create a user', async () => {
-      const createUserDto = {
+    it('should create and return a user', async () => {
+      const createUserDto: CreateUserDto = {
         name: 'Test User',
         email: 'test@example.com',
         role: 'user',
         password: 'password',
       };
-      const savedUser = { ...createUserDto, save: jest.fn().mockResolvedValue(createUserDto) };
-      
-      mockUserModel.new.mockReturnValue(savedUser);
-      
+
+      (model.create as jest.Mock).mockResolvedValue(mockUser);
+
       const result = await service.create(createUserDto);
-      
-      expect(mockUserModel.new).toHaveBeenCalledWith(createUserDto);
-      expect(savedUser.save).toHaveBeenCalled();
-      expect(result).toEqual(createUserDto);
+
+      expect(model.create).toHaveBeenCalledWith(createUserDto);
+      expect(result).toEqual(mockUser);
     });
   });
 
   describe('findAll', () => {
     it('should return an array of users', async () => {
-      const users = [{ name: 'Test User' }];
+      const users = [mockUser];
       mockUserModel.find.mockReturnValue({
         exec: jest.fn().mockResolvedValue(users),
-      });
+      } as any);
+
       const result = await service.findAll();
+
+      expect(model.find).toHaveBeenCalledWith({});
       expect(result).toEqual(users);
     });
-  });
 
-  describe('exportToCsv', () => {
-    it('should export user data to CSV', async () => {
-      const users = [
-        {
-          role: 'admin',
-          name: 'Admin User',
-          email: 'admin@example.com',
-          created_at: Date.now(),
-          updated_at: Date.now(),
-        },
-      ];
-      jest.spyOn(service, 'findAll').mockResolvedValue(users as any);
+    it('should return an empty array if no users are found', async () => {
+      mockUserModel.find.mockReturnValue({
+        exec: jest.fn().mockResolvedValue([]),
+      } as any);
 
-      const csv = await service.exportToCsv();
+      const result = await service.findAll();
 
-      expect(csv).toContain('role,name,email,created_at,updated_at');
-      expect(csv).toContain(
-        `${users[0].role},${users[0].name},${users[0].email}`,
-      );
+      expect(model.find).toHaveBeenCalledWith({});
+      expect(result).toEqual([]);
     });
   });
 
-  describe('exportToXlsx', () => {
-    it('should export user data to XLSX', async () => {
-      const users = [
-        {
-          role: 'admin',
-          name: 'Admin User',
-          email: 'admin@example.com',
-          created_at: Date.now(),
-          updated_at: Date.now(),
-        },
-      ];
-      jest.spyOn(service, 'findAll').mockResolvedValue(users as any);
+  describe('findOne', () => {
+    it('should find and return a user by ID', async () => {
+      mockUserModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockUser),
+      } as any);
 
-      const buffer = await service.exportToXlsx();
+      const result = await service.findOne(1);
 
-      expect(buffer).toBeInstanceOf(Buffer);
+      expect(model.findById).toHaveBeenCalledWith(1);
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should return null if user is not found', async () => {
+      mockUserModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      } as any);
+
+      const result = await service.findOne(1);
+
+      expect(model.findById).toHaveBeenCalledWith(1);
+      expect(result).toBeNull();
     });
   });
 
-  describe('getInsights', () => {
-    it('should return a message if no data is available', async () => {
-      jest.spyOn(service, 'findAll').mockResolvedValue([]);
-      const insights = await service.getInsights();
-      expect(insights).toEqual({
-        message: 'No user data available to generate insights.',
+  describe('update', () => {
+    it('should find and update a user by ID', async () => {
+      const updateUserDto = { name: 'Updated User' };
+      const updatedUser = { ...mockUser, ...updateUserDto };
+
+      mockUserModel.findByIdAndUpdate.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(updatedUser),
+      } as any);
+
+      const result = await service.update(1, updateUserDto);
+
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(1, updateUserDto, {
+        new: true,
       });
+      expect(result).toEqual(updatedUser);
     });
 
-    it('should return insights if data is available', async () => {
-      const users = [
-        {
-          role: 'admin',
-          name: 'Admin User',
-          email: 'admin@example.com',
-          created_at: Date.now(),
-          updated_at: Date.now(),
-        },
-      ];
-      jest.spyOn(service, 'findAll').mockResolvedValue(users as any);
-      const insights = await service.getInsights();
-      expect(insights).toBeUndefined(); // TODO: Implement insights logic and update test
+    it('should return null if user to update is not found', async () => {
+      const updateUserDto = { name: 'Updated User' };
+      mockUserModel.findByIdAndUpdate.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      } as any);
+
+      const result = await service.update(1, updateUserDto);
+
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(1, updateUserDto, {
+        new: true,
+      });
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('remove', () => {
+    it('should find and remove a user by ID', async () => {
+      mockUserModel.findByIdAndDelete.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockUser),
+      } as any);
+
+      const result = await service.remove(1);
+
+      expect(model.findByIdAndDelete).toHaveBeenCalledWith(1);
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should return null if user to remove is not found', async () => {
+      mockUserModel.findByIdAndDelete.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      } as any);
+
+      const result = await service.remove(1);
+
+      expect(model.findByIdAndDelete).toHaveBeenCalledWith(1);
+      expect(result).toBeNull();
     });
   });
 });
