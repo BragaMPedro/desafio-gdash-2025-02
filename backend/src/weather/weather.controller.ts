@@ -1,17 +1,20 @@
-import { Controller, Get, Post, Body, Res } from '@nestjs/common';
-import { WeatherService } from './weather.service';
-import { CreateWeatherDto } from './dto/create-weather.dto';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
+import { Public } from 'src/auth/decorators/public.decorators';
+import { CreateWeatherDto } from './dto/create-weather.dto';
+import { WeatherService } from './weather.service';
 
 @Controller('weather')
 export class WeatherController {
   constructor(private readonly weatherService: WeatherService) {}
 
+  @Public()
   @Post()
   create(@Body() createWeatherDto: CreateWeatherDto) {
     return this.weatherService.create(createWeatherDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.weatherService.findAll();

@@ -11,11 +11,11 @@ export class AuthService {
   ) {}
 
   async signIn(email: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findOne({email: email});
    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("Email or password is incorrect");
     }
-    const payload = { sub: user._id, username: user.email };
+    const payload = { email: user.email, sub: user._id };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

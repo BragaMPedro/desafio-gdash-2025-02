@@ -8,32 +8,28 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   
-  // @UseGuards(AuthGuard)
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
   
-  // @UseGuards(AuthGuard)
   @Get()
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
   
-  // @UseGuards(AuthGuard)
   @Get(':id')
   async findById(@Param('id') id: string){
     return this.usersService.findById(id);
   }
   
-  // @UseGuards(AuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
   
-  // @UseGuards(AuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
