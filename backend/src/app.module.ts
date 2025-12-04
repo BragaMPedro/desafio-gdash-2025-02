@@ -15,7 +15,7 @@ import { WeatherModule } from './weather/weather.module';
       useFactory: async (configService: ConfigService) => ({
         uri:
           configService.get<string>('MONGODB_URI') ||
-          'mongodb://mongodb:27017',
+          'mongodb://admin:minhasenha@localhost:27017/?authSource=admin',
       }),
     }),
     WeatherModule,
