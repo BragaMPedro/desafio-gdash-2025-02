@@ -12,7 +12,7 @@ import { jwtConstants } from './constants';
     UsersModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '3600' },
+      signOptions: { expiresIn: '3600s' },
     }),
   ],
   controllers: [AuthController],
