@@ -1,8 +1,11 @@
 import {
   ConflictException,
   Injectable,
-  NotFoundException
+  Logger,
+  NotFoundException,
+  OnModuleInit
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,10 +13,45 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
+  private readonly logger = new Logger(UsersService.name);
+  
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly configService: ConfigService,
   ) {}
+
+  async onModuleInit() {
+    await this.seedAdminUser();
+  }
+
+  private async seedAdminUser() {
+    const adminEmail = this.configService.get<string>('ADMIN_EMAIL');
+    const adminPassword = this.configService.get<string>('ADMIN_PASSWORD');
+
+    if (!adminEmail || !adminPassword) {
+      this.logger.warn(
+        'ADMIN_EMAIL or ADMIN_PASSWORD not set in environment variables. Skipping admin seeding.',
+      );
+      return;
+    }
+
+    const existingAdmin = await this.userModel.findOne({ email: adminEmail }).exec();
+
+    if (existingAdmin) {
+      this.logger.log(`Admin user ${adminEmail} already exists. Skipping creation.`);
+      return
+    }
+    
+    const adminUser: CreateUserDto = {
+      name: 'ADMIN',
+      email: adminEmail,
+      password: adminPassword, // Note: In a production app, ensure this is hashed!
+    };
+
+      await this.create(adminUser);
+      this.logger.log('Default admin user created successfully.');
+  }
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const existingUser = await this.userModel.findOne({ email: createUserDto.email }).exec();
