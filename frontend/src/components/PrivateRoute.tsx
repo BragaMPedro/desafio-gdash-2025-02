@@ -1,8 +1,18 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useContext } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 export function PrivateRoute() {
-  // TODO: Implement authentication logic
-  const isAuthenticated = true; 
+  const { isAuthenticated, isLoading } = useContext(AuthContext);
+  const origin = useLocation();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Carregando...</div>;
+  }
+
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" state={{ from: origin }} replace />
+  );
 }

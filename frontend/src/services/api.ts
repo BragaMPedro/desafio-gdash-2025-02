@@ -1,12 +1,21 @@
 import axios, { type AxiosResponse } from 'axios';
-
+import Cookies from "js-cookie";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_KEY ?? 'https://localhost:3000'
+  baseURL: import.meta.env.VITE_API_KEY ?? 'http://localhost:3000'
+});
+
+// axios interceptor
+api.interceptors.request.use((config) => {
+  const token = Cookies.get('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const signIn = (email: string, password: string): Promise<AxiosResponse<any>> =>{
-    return api.post("/api/auth/login", {data: { email, password } })
+    return api.post("/api/auth/login", { email, password })
 };
 
 export const getWeatherData = (): Promise<AxiosResponse<any>> =>{

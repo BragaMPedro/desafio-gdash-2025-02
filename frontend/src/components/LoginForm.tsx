@@ -12,7 +12,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useContext } from "react";
 
 const FormSchema = z.object({
   username: z.email({
@@ -24,6 +25,8 @@ const FormSchema = z.object({
 });
 
 export function LoginForm() {
+  const { isLoading, login } = useContext(AuthContext);
+  
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -32,11 +35,8 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    //TODO implement login logic
-    return toast("You submitted the following values:",
-      { description: JSON.stringify(data, null, 2) }
-    );
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+      await login(data.username, data.password);
   }
 
   return (
@@ -68,7 +68,7 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" disabled={isLoading}>
           Submit
         </Button>
       </form>
