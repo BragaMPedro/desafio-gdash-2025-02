@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { Public } from 'src/auth/decorators/public.decorators';
+import { PaginationDto } from 'src/utils/dto/pagination.dto';
 import { CreateWeatherDto } from './dto/create-weather.dto';
 import { WeatherService } from './weather.service';
 
@@ -16,8 +17,8 @@ export class WeatherController {
 
   @Public()
   @Get()
-  findAll() {
-    return this.weatherService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.weatherService.findAll(paginationDto);
   }
 
   @Get('insights')

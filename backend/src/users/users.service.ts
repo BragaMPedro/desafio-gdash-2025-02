@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
+import { PaginationDto } from 'src/utils/dto/pagination.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -64,8 +65,29 @@ export class UsersService implements OnModuleInit {
     return createdUser.save();
   }
 
-  async findAll(): Promise<UserDocument[]> {
-    return this.userModel.find().exec();
+  async findAll(paginationDto: PaginationDto = {}): Promise<{data: UserDocument[], meta: any}> {
+        const { page = 1, limit = 10 } = paginationDto;
+    const skip = (page - 1) * limit;
+
+    // Busca os dados com paginação e ordenação (mais recentes primeiro)
+    const data = await this.userModel.find()
+      .sort({ timestamp: -1 }) // Ordena do mais novo para o mais antigo
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    // Conta o total para o frontend saber quantas páginas existem
+    const total = await this.userModel.countDocuments();
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        lastPage: Math.ceil(total / limit),
+      }
+    };
   }
 
   async findById(id: string): Promise<UserDocument> {
