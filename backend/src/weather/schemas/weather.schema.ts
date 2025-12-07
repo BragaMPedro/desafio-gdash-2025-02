@@ -6,7 +6,7 @@ export type WeatherDocument = Weather & Document;
 @Schema()
 export class Weather {
   @Prop()
-  temp: number;
+  temperature: number;
 
   @Prop()
   humidity: number;

@@ -1,3 +1,4 @@
+import type { WeatherDataResponse } from '@/types';
 import axios, { type AxiosResponse } from 'axios';
 import Cookies from "js-cookie";
 
@@ -14,11 +15,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const signIn = (email: string, password: string): Promise<AxiosResponse<any>> =>{
+export const signIn = (email: string, password: string): Promise<AxiosResponse<{access_token: string}>> =>{
     return api.post("/api/auth/login", { email, password })
 };
 
-export const getWeatherData = (): Promise<AxiosResponse<any>> =>{
+export const getWeatherData = (): Promise<AxiosResponse<WeatherDataResponse[]>> =>{
     return api.get("/api/weather")
 };
 
