@@ -1,12 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { WeatherCard } from "@/components/WeatherCard";
+import { WeatherTable } from "@/components/WeatherTable";
 import { getWeatherData } from "@/services/api";
-import { CodigoClimaWMO, DescricaoClima, type WeatherCard, type WeatherDataResponse } from "@/types";
+import { CodigoClimaWMO, DescricaoClima, type WeatherData, type WeatherDataResponse } from "@/types";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
    const [isLoading, setIsLoading] = useState<boolean>(true);
    const [weatherData, setWeatherData] = useState<WeatherDataResponse[]>([]);
-   const [latestWeather, setLatestWeather] = useState<WeatherCard>({} as WeatherCard);
+   const [latestWeather, setLatestWeather] = useState<WeatherData>({} as WeatherData);
 
    useEffect(() => {
       fetchWeatherData();
@@ -21,7 +23,7 @@ export default function Dashboard() {
 
          const latest = res.data[res.data.length - 1];
          setLatestWeather({
-            temperature: { title: "Temperatura", value: latest.temperature, unit: "°C" },
+            temperature: { title: "Temperatura", value: latest.temperature.toFixed(2), unit: "°C" },
             humidity: { title: "Umidade", value: latest.humidity, unit: "%" },
             precipitation_probability: {
                title: "Probabilidade de Precipitação",
@@ -48,17 +50,19 @@ export default function Dashboard() {
             {Object.values(latestWeather).map((element, index) => {
               if(element.title === "Timestamp") return;
                return (
-               <Card key={index}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                     <CardTitle className="text-sm font-medium">{element.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                     <div className="text-2xl font-bold">{element.value} {element?.unit}</div>
-                  </CardContent>
-               </Card>
-            );
+                <WeatherCard key={index} title={element.title} value={element.value} unit={element.unit} />
+               );
             })}
          </div>
+
+         <Card>
+            <CardHeader>
+               <CardTitle>Histórico Climático</CardTitle>
+            </CardHeader>
+            <CardContent>
+               <WeatherTable weatherData={weatherData} />
+            </CardContent>
+         </Card>
       </div>
    );
 }
