@@ -12,7 +12,7 @@ export interface WeatherDataResponse {
    __v: number;
 };
 
-export interface WeatherCard {
+export interface WeatherData {
     temperature: WeatherParam;
     humidity: WeatherParam
    precipitation_probability: WeatherParam;
