@@ -33,7 +33,7 @@ export class WeatherService {
 
       weatherData.forEach((weather) => {
         csvStream.write({
-          temp: weather.temp,
+          temperature: weather.temperature,
           humidity: weather.humidity,
           wind_speed: weather.wind_speed,
           precipitation_probability: weather.precipitation_probability,
@@ -51,7 +51,7 @@ export class WeatherService {
   async exportToXlsx(): Promise<Buffer> {
     const weatherData = await this.findAll();
     const data = weatherData.map((weather) => ({
-      temp: weather.temp,
+      temperature: weather.temperature,
       humidity: weather.humidity,
       wind_speed: weather.wind_speed,
       precipitation_probability: weather.precipitation_probability,
