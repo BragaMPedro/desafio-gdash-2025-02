@@ -33,6 +33,8 @@ cp .env.example .env
    - `VITE_BACKEND_API_URL`: URL completa da API para ser usada pelo frontend, este padrão é específico do Vite (ex: `http://api:3000`).
    - `FRONTEND_URL`: Está URL será usada para configurações de CORS no backend. Deve ser a mesma que seu frontend usará, normalmente `http://frontend:5173`
    - `ADMIN_EMAIL` e `ADMIN_PASSWORD`: Credenciais para o usuário administrador padrão que será criado na inicialização (ex: `admin@example.com` e `password123`). Está etapa é muito importante para o funcionamento correto do sistema e acesso do usuário.
+
+
 *Note que nesta configuração, ao invés de `localhost`, para que os serviços se comuniquem entre si são usados os nome dos próprios. Para acesso ver seção [URLs Principais](#urls-principais)
 
 ## Como Rodar a Aplicação
