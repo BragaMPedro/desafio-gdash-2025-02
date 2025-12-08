@@ -1,5 +1,6 @@
 import { PaginationComponent } from "@/components/PaginationComponent";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { WeatherCard } from "@/components/WeatherCard";
 import { WeatherTable } from "@/components/WeatherTable";
 import { getWeatherData } from "@/services/api";
@@ -52,6 +53,7 @@ export default function Dashboard() {
    return (
       <div className="p-8 space-y-4">
          <h1 className="text-3xl font-bold">Dashboard</h1>
+
          <p>Última atualização: {latestWeather.timestamp?.value}</p>
          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {Object.values(latestWeather).map((element, index) => {
@@ -67,7 +69,10 @@ export default function Dashboard() {
                <CardTitle>Histórico Climático</CardTitle>
             </CardHeader>
             <CardContent>
-               <WeatherTable weatherData={weatherData} />
+               {isLoading
+                  ? <Spinner className="size-8" />
+                  : <WeatherTable weatherData={weatherData} />
+               }
             </CardContent>
             <CardFooter>
                <PaginationComponent currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} />

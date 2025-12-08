@@ -23,23 +23,9 @@ export interface WeatherData {
 }
 
 export interface WeatherParam {
-    title: string;
-    value: number|string;
-    unit?: string;
-}
-
-// export interface WeatherParam {
-//     title: WeatherTitle[keyof typeof WeatherTitle];
-//     value: number;
-// }
-
-export enum WeatherParamTitle {
-    TEMPERATURE = "Temperatura",
-    HUMIDITY = "Umidade",
-    PRECIPITATION_PROBABILITY = "Probabilidade de Precipitação",
-    CLOUD_COVER = "Cobertura de Nuvens",
-    WIND_SPEED = "Velocidade do Vento",
-    WEATHER_CODE = "Código do Clima"
+ title: string;
+ value: number|string;
+ unit?: string;
 }
 
 export enum CodigoClimaWMO {
