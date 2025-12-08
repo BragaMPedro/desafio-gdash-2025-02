@@ -1,0 +1,43 @@
+import type { WeatherDataResponse } from '@/types';
+import axios, { type AxiosResponse } from 'axios';
+import Cookies from "js-cookie";
+
+interface MetaData {
+    total: number;
+    page: number;
+    limit: number;
+    lastPage: number;
+}
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_KEY ?? 'http://localhost:3000'
+});
+
+// axios interceptor
+api.interceptors.request.use((config) => {
+  const token = Cookies.get('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const signIn = (email: string, password: string): Promise<AxiosResponse<{access_token: string}>> =>{
+    return api.post("/api/auth/login", { email, password })
+};
+
+export const getWeatherData = (page = 1, limit = 10): Promise<AxiosResponse<{data: WeatherDataResponse[], meta: MetaData}>> =>{
+    return api.get(`/api/weather?page=${page}&limit=${limit}`)
+};
+
+export const getWeatherInsights = (): Promise<AxiosResponse<any>> =>{
+    return api.get("/api/weather/insights")
+};
+
+export const exportCsv = (): Promise<AxiosResponse<any>> =>{
+    return api.get("/api/weather/export/csv")
+};
+
+export const exportXlsx = (): Promise<AxiosResponse<any>> =>{
+    return api.get("/api/weather/export/xlsx")
+};
