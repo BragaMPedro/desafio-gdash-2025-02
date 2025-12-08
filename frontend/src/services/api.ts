@@ -2,6 +2,13 @@ import type { WeatherDataResponse } from '@/types';
 import axios, { type AxiosResponse } from 'axios';
 import Cookies from "js-cookie";
 
+interface MetaData {
+    total: number;
+    page: number;
+    limit: number;
+    lastPage: number;
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_KEY ?? 'http://localhost:3000'
 });
@@ -19,8 +26,8 @@ export const signIn = (email: string, password: string): Promise<AxiosResponse<{
     return api.post("/api/auth/login", { email, password })
 };
 
-export const getWeatherData = (): Promise<AxiosResponse<WeatherDataResponse[]>> =>{
-    return api.get("/api/weather")
+export const getWeatherData = (page = 1, limit = 10): Promise<AxiosResponse<{data: WeatherDataResponse[], meta: MetaData}>> =>{
+    return api.get(`/api/weather?page=${page}&limit=${limit}`)
 };
 
 export const getWeatherInsights = (): Promise<AxiosResponse<any>> =>{

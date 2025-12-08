@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaginationComponent } from "@/components/PaginationComponent";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { WeatherCard } from "@/components/WeatherCard";
 import { WeatherTable } from "@/components/WeatherTable";
 import { getWeatherData } from "@/services/api";
@@ -9,21 +10,27 @@ export default function Dashboard() {
    const [isLoading, setIsLoading] = useState<boolean>(true);
    const [weatherData, setWeatherData] = useState<WeatherDataResponse[]>([]);
    const [latestWeather, setLatestWeather] = useState<WeatherData>({} as WeatherData);
+   const [currentPage, setCurrentPage] = useState(1);
+   const [totalPages, setTotalPages] = useState(1);
 
    useEffect(() => {
       fetchWeatherData();
-   }, []);
+   }, [currentPage]);
 
    const fetchWeatherData = async () => {
       setIsLoading(true);
 
       try {
-         const res = await getWeatherData();
-         setWeatherData(res.data);
+         const res = await getWeatherData(currentPage);
 
-         const latest = res.data[res.data.length - 1];
+         const responseData = res.data.data
+         const meta = res.data.meta;
+         setTotalPages(meta.lastPage);
+         setWeatherData(responseData);
+
+         const latest = responseData[0];
          setLatestWeather({
-            temperature: { title: "Temperatura", value: latest.temperature.toFixed(2), unit: "°C" },
+            temperature: { title: "Temperatura", value: latest.temperature?.toFixed(2), unit: "°C" },
             humidity: { title: "Umidade", value: latest.humidity, unit: "%" },
             precipitation_probability: {
                title: "Probabilidade de Precipitação",
@@ -62,6 +69,9 @@ export default function Dashboard() {
             <CardContent>
                <WeatherTable weatherData={weatherData} />
             </CardContent>
+            <CardFooter>
+               <PaginationComponent currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} />
+            </CardFooter>
          </Card>
       </div>
    );

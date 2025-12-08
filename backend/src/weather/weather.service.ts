@@ -18,7 +18,7 @@ export class WeatherService {
     return createdWeather.save();
   }
 
-  async findAll(paginationDto: PaginationDto = {}): Promise<{data: Weather[], meta: any}> {
+  async findAll(paginationDto: PaginationDto = {}): Promise<{data: Weather[], meta: { total: number; page: number; limit: number; lastPage: number; }}> {
     const { page = 1, limit = 10 } = paginationDto;
     const skip = (page - 1) * limit;
 
