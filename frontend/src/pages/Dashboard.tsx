@@ -55,7 +55,7 @@ export default function Dashboard() {
          <h1 className="text-3xl font-bold">Dashboard</h1>
 
          <p>Última atualização: {latestWeather.timestamp?.value}</p>
-         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+         <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
             {Object.values(latestWeather).map((element, index) => {
               if(element.title === "Timestamp") return;
                return (

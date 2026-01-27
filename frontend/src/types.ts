@@ -13,8 +13,8 @@ export interface WeatherDataResponse {
 };
 
 export interface WeatherData {
-    temperature: WeatherParam;
-    humidity: WeatherParam
+   temperature: WeatherParam;
+   humidity: WeatherParam;
    precipitation_probability: WeatherParam;
    cloud_cover: WeatherParam;
    wind_speed: WeatherParam;
