@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { AuthContext } from "@/contexts/AuthContext";
-import { useContext } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useContext, useState } from "react";
 
 const FormSchema = z.object({
   username: z.email({
@@ -26,6 +27,7 @@ const FormSchema = z.object({
 
 export function LoginForm() {
   const { isLoading, login } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
   
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -61,9 +63,28 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
-              </FormControl>
+              <div className="relative">
+                <FormControl>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    {...field}
+                  />
+                </FormControl>
+                <div className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-gray-400">
+                  {showPassword ? (
+                    <EyeOff
+                      className="h-5 w-5"
+                      onClick={() => setShowPassword(false)}
+                    />
+                  ) : (
+                    <Eye
+                      className="h-5 w-5"
+                      onClick={() => setShowPassword(true)}
+                    />
+                  )}
+                </div>
+              </div>
               <FormMessage />
             </FormItem>
           )}
