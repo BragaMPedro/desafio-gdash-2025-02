@@ -2,6 +2,7 @@ import { PaginationComponent } from "@/components/PaginationComponent";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { WeatherCard } from "@/components/WeatherCard";
+import { WeatherLineChart } from "@/components/WeatherLineChart";
 import { WeatherTable } from "@/components/WeatherTable";
 import { getWeatherData } from "@/services/api";
 import { CodigoClimaWMO, DescricaoClima, type WeatherData, type WeatherDataResponse } from "@/types";
@@ -64,6 +65,17 @@ export default function Dashboard() {
             })}
          </div>
 
+         <Card>
+            <CardHeader>
+               <CardTitle>Dados Recentes</CardTitle>
+            </CardHeader>
+            <CardContent>
+               {isLoading
+                  ? <Spinner className="size-8" />
+                  : <WeatherLineChart weatherData={weatherData}/>
+               }
+            </CardContent>
+         </Card>
          <Card>
             <CardHeader>
                <CardTitle>Histórico Climático</CardTitle>
